@@ -1,0 +1,329 @@
+openapi: 3.0.3
+
+info:
+  title: Mock Sitecore - OpenAPI 3.0
+  description: |-
+    This is a minimalist example (schema generated with "ts-json-schema-generator" off of "./node_modules/@sitecore-jss/sitecore-jss/types/layout/models.d.ts") resembling the Sitecore Layout Service.  It is based on the OpenAPI 3.0 specification.
+
+    Sitecore CMS doesn't provide OpenAPI/Swagger specification files for their Layout Service's REST API.
+
+    This handwritten specification file may not reflect the full level of detail that may be included in a real HTTP response from Sitecore CMS's layout service API.
+    
+    However, it can be used to learn the service's most common request structure expectations.
+    
+    It also provides minimalist example responses that can be used to drive a mock server.
+  contact:
+    name: "Example Example"
+    email: "example@example.com"
+  version: 1.0.0
+
+tags:
+  - name: layout
+    description: The layout service
+
+paths:
+  /sitecore/api/layout/render/jss:
+    get:
+      tags:
+        - layout
+      summary: Layout of a Sitecore page
+      description: Layout details for a Sitecore page
+      operationId: renderLayoutJss
+      parameters:
+        - name: sc_site
+          in: query
+          description: Site name
+          required: true
+          schema:
+            type: string
+            default: examplesitename
+        - name: sc_apikey
+          in: query
+          description: API key
+          required: true
+          schema:
+            type: string
+            format: uuid
+            default: 00000000-0000-0000-0000-000000000000
+        - name: item
+          in: query
+          description: Page identifier
+          required: true
+          schema:
+            type: string
+            default: /red/pepperoni
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LayoutServiceData"
+        "500":
+          description: A server error response
+
+
+
+components:
+  schemas:
+    LayoutServiceData:
+      type: object
+      properties:
+        sitecore:
+          type: object
+          additionalProperties: false
+          properties:
+            route:
+              "$ref": "#/components/schemas/RouteData"
+              nullable: true
+            context:
+              "$ref": "#/components/schemas/LayoutServiceContext"
+          required:
+            - context
+            - route
+      required:
+        - sitecore
+      additionalProperties: false
+      description: A reply from the Sitecore Layout Service
+    LayoutServiceContextData:
+      type: object
+      properties:
+        context:
+          "$ref": "#/components/schemas/LayoutServiceContext"
+      required:
+        - context
+      additionalProperties: false
+      description: Context information from the Sitecore Layout Service
+    LayoutServiceContext:
+      type: object
+      properties:
+        pageEditing:
+          type: boolean
+        language:
+          type: string
+        pageState:
+          "$ref": "#/components/schemas/LayoutServicePageState"
+        visitorIdentificationTimestamp:
+          type: number
+        site:
+          type: object
+          properties:
+            name:
+              type: string
+          additionalProperties: false
+        editMode:
+          "$ref": "#/components/schemas/EditMode"
+        clientScripts:
+          type: array
+          items:
+            type: string
+        clientData:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties: {}
+      additionalProperties: {}
+      description: Shape of context data from the Sitecore Layout Service
+    LayoutServicePageState:
+      type: string
+      enum:
+        - preview
+        - edit
+        - normal
+      description: Layout Service page state enum
+    EditMode:
+      type: string
+      enum:
+        - chromes
+        - metadata
+      description: |-
+        Represents the possible modes for rendering content in Sitecore Editor
+        - chromes - supported by Sitecore Experience Editor / Pages
+        - metadata - supported by Sitecore Pages
+    RouteData:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            anyOf:
+              - "$ref": "#/components/schemas/Field"
+              - "$ref": "#/components/schemas/Item"
+              - type: array
+                items:
+                  "$ref": "#/components/schemas/Item"
+        databaseName:
+          type: string
+        deviceId:
+          type: string
+        itemLanguage:
+          type: string
+        itemVersion:
+          type: number
+        layoutId:
+          type: string
+        templateId:
+          type: string
+        templateName:
+          type: string
+        placeholders:
+          "$ref": "#/components/schemas/PlaceholdersData"
+        itemId:
+          type: string
+      required:
+        - name
+        - placeholders
+      additionalProperties: false
+      description: Shape of route data returned from Sitecore Layout Service
+    Field:
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties: {}
+        value:
+          "$ref": "#/components/schemas/GenericFieldValue"
+        editable:
+          type: string
+      required:
+        - value
+      additionalProperties: false
+    FieldMetadata:
+      type: object
+      properties:
+        metadata:
+          type: object
+          additionalProperties: {}
+      additionalProperties: false
+      description:
+        represents the field metadata provided by layout service in editMode
+        'metadata'
+    GenericFieldValue:
+      anyOf:
+        - type: string
+        - type: boolean
+        - type: number
+        - type: object
+          additionalProperties: {}
+        - type: array
+          items:
+            type: object
+            additionalProperties: {}
+      description: Field value data on a component
+    Item:
+      type: object
+      properties:
+        name:
+          type: string
+        displayName:
+          type: string
+        id:
+          type: string
+        url:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            anyOf:
+              - "$ref": "#/components/schemas/Field"
+              - "$ref": "#/components/schemas/Item"
+              - type: array
+                items:
+                  "$ref": "#/components/schemas/Item"
+              - not: {}
+      required:
+        - name
+        - fields
+      additionalProperties: false
+      description: Content data returned from Content Service
+    PlaceholdersData:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          anyOf:
+            - "$ref": "#/components/schemas/ComponentRendering"
+            - "$ref": "#/components/schemas/HtmlElementRendering"
+      description:
+        "Placeholder contents data (name: placeholder name, then array of
+        components within that placeholder name) Note: HtmlElementRendering is used
+        by Sitecore Experience Editor"
+    ComponentRendering:
+      type: object
+      properties:
+        componentName:
+          type: string
+        dataSource:
+          type: string
+        uid:
+          type: string
+        placeholders:
+          "$ref": "#/components/schemas/PlaceholdersData"
+        fields:
+          "$ref": "#/components/schemas/ComponentFields"
+        params:
+          "$ref": "#/components/schemas/ComponentParams"
+      required:
+        - componentName
+      additionalProperties: false
+      description: Definition of a component instance within a placeholder on a route
+    ComponentFields:
+      type: object
+      additionalProperties:
+        anyOf:
+          - "$ref": "#/components/schemas/Field"
+          - "$ref": "#/components/schemas/Item"
+          - type: array
+            items:
+              "$ref": "#/components/schemas/Item"
+      description: Content field data passed to a component
+    ComponentParams:
+      type: object
+      additionalProperties:
+        type: string
+      description: Component params
+    HtmlElementRendering:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        contents:
+          type: "string"
+          nullable: true
+        attributes:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - not: {}
+      required:
+        - name
+        - contents
+        - attributes
+      additionalProperties: false
+      description: HTML content used to support Sitecore Experience Editor
+    PlaceholderData:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+        elements:
+          type: array
+          items:
+            anyOf:
+              - "$ref": "#/components/schemas/HtmlElementRendering"
+              - "$ref": "#/components/schemas/ComponentRendering"
+      required:
+        - name
+        - path
+        - elements
+      additionalProperties: false
+      description: Contents of a single placeholder returned from placeholder service
