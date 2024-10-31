@@ -15,6 +15,7 @@ info:
   contact:
     name: "Example Example"
     email: "example@example.com"
+    url: "https://github.com/Sitecore/jss/blob/dev/packages/sitecore-jss/src/layout/models.ts"
   version: 1.0.0
 
 servers:
@@ -93,7 +94,6 @@ components:
           properties:
             name:
               type: string
-              example: null
         pageState:
           type: string
           example: normal
@@ -142,11 +142,11 @@ components:
         layoutId:
           type: string
           format: uuid
-          example: "22222222-2222-2222-222222222222"
+          example: "22222222-2222-2222-2222-222222222222"
         templateId:
           type: string
           format: uuid
-          example: "33333333-3333-3333-333333333333"
+          example: "33333333-3333-3333-3333-333333333333"
         templateName:
           type: string
           example: "Sample Page Item Etc"
@@ -167,12 +167,8 @@ components:
         - value
       additionalProperties: false
       example:
-        hello:
-          editable: false
-          value: "world"
-        later:
-          editable: true
-          value: "alligator"
+        editable: "not editable"
+        value: "hello world"
 
     GenericFieldValue:
       anyOf:
@@ -292,23 +288,3 @@ components:
         - attributes
       additionalProperties: false
       description: HTML content used to support Sitecore Experience Editor
-    
-    PlaceholderData:
-      type: object
-      properties:
-        name:
-          type: string
-        path:
-          type: string
-        elements:
-          type: array
-          items:
-            anyOf:
-              - "$ref": "#/components/schemas/HtmlElementRendering"
-              - "$ref": "#/components/schemas/ComponentRendering"
-      required:
-        - name
-        - path
-        - elements
-      additionalProperties: false
-      description: Contents of a single placeholder returned from placeholder service
