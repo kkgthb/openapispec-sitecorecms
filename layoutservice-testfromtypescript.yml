@@ -7,7 +7,7 @@ info:
 
     Sitecore CMS doesn't provide OpenAPI/Swagger specification files for their Layout Service's REST API.
 
-    This handwritten specification file may not reflect the full level of detail that may be included in a real HTTP response from Sitecore CMS's layout service API.
+    This semi-handwritten specification file may not reflect the full level of detail that may be included in a real HTTP response from Sitecore CMS's layout service API.
 
     However, it can be used to learn the service's most common request structure expectations.
 
@@ -16,6 +16,10 @@ info:
     name: "Example Example"
     email: "example@example.com"
   version: 1.0.0
+
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/kswaggerhub/SitecoreLayoutService/1.0.0
 
 tags:
   - name: layout
@@ -66,82 +70,40 @@ components:
   schemas:
     LayoutServiceData:
       type: object
+      additionalProperties: false
       properties:
         sitecore:
           type: object
-          additionalProperties: false
           properties:
-            route:
-              "$ref": "#/components/schemas/RouteData"
-              nullable: true
             context:
-              "$ref": "#/components/schemas/LayoutServiceContext"
-          required:
-            - context
-            - route
-      required:
-        - sitecore
-      additionalProperties: false
-      description: A reply from the Sitecore Layout Service
-    LayoutServiceContextData:
-      type: object
-      properties:
-        context:
-          "$ref": "#/components/schemas/LayoutServiceContext"
-      required:
-        - context
-      additionalProperties: false
-      description: Context information from the Sitecore Layout Service
-    LayoutServiceContext:
+              $ref: "#/components/schemas/LayoutJssContext"
+            route:
+              allOf:
+                - $ref: "#/components/schemas/RouteData"
+              nullable: true
+
+    LayoutJssContext:
       type: object
       properties:
         pageEditing:
           type: boolean
           example: false
-        language:
-          type: string
-          example: "en"
-        pageState:
-          "$ref": "#/components/schemas/LayoutServicePageState"
-          example: "normal"
-        visitorIdentificationTimestamp:
-          type: number
         site:
           type: object
           properties:
             name:
               type: string
               example: null
-          additionalProperties: false
-        editMode:
-          "$ref": "#/components/schemas/EditMode"
-        clientScripts:
-          type: array
-          items:
-            type: string
-        clientData:
-          type: object
-          additionalProperties:
-            type: object
-            additionalProperties: {}
-      additionalProperties: {}
-      description: Shape of context data from the Sitecore Layout Service
-    LayoutServicePageState:
-      type: string
-      enum:
-        - preview
-        - edit
-        - normal
-      description: Layout Service page state enum
-    EditMode:
-      type: string
-      enum:
-        - chromes
-        - metadata
-      description: |-
-        Represents the possible modes for rendering content in Sitecore Editor
-        - chromes - supported by Sitecore Experience Editor / Pages
-        - metadata - supported by Sitecore Pages
+        pageState:
+          type: string
+          example: normal
+        language:
+          type: string
+          example: en
+        itemPath:
+          type: string
+          example: "/sitecore/content/red/pepperoni"
+
     RouteData:
       type: object
       properties:
@@ -160,21 +122,20 @@ components:
               - type: array
                 items:
                   "$ref": "#/components/schemas/Item"
-          example:
-            hello:
-              value: "world"
-            later:
-              value: "alligator"
         databaseName:
           type: string
-          example: "iamadb"
+          example: iamadb
         deviceId:
           type: string
           format: uuid
           example: "fe5d7fdf-89c0-4d99-9aa3-b5fbd009c9f3"
+        itemId:
+          type: string
+          format: uuid
+          example: "11111111-1111-1111-1111-111111111111"
         itemLanguage:
           type: string
-          example: "en"
+          example: en
         itemVersion:
           type: integer
           example: 1
@@ -191,15 +152,7 @@ components:
           example: "Sample Page Item Etc"
         placeholders:
           "$ref": "#/components/schemas/PlaceholdersData"
-        itemId:
-          type: string
-          format: uuid
-          example: "11111111-1111-1111-1111-111111111111"
-      required:
-        - name
-        - placeholders
-      additionalProperties: false
-      description: Shape of route data returned from Sitecore Layout Service
+
     Field:
       type: object
       properties:
@@ -213,16 +166,14 @@ components:
       required:
         - value
       additionalProperties: false
-    FieldMetadata:
-      type: object
-      properties:
-        metadata:
-          type: object
-          additionalProperties: {}
-      additionalProperties: false
-      description:
-        represents the field metadata provided by layout service in editMode
-        'metadata'
+      example:
+        hello:
+          editable: false
+          value: "world"
+        later:
+          editable: true
+          value: "alligator"
+
     GenericFieldValue:
       anyOf:
         - type: string
@@ -236,6 +187,7 @@ components:
             additionalProperties: {}
       description: Field value data on a component
       example: "field value 0"
+
     Item:
       type: object
       properties:
@@ -262,6 +214,7 @@ components:
         - fields
       additionalProperties: false
       description: Content data returned from Content Service
+
     PlaceholdersData:
       type: object
       additionalProperties:
@@ -274,6 +227,8 @@ components:
         "Placeholder contents data (name: placeholder name, then array of
         components within that placeholder name) Note: HtmlElementRendering is used
         by Sitecore Experience Editor"
+
+
     ComponentRendering:
       type: object
       properties:
@@ -285,6 +240,7 @@ components:
           example: "{44444444-4444-4444-444444444444}"
         uid:
           type: string
+          example: "123"
         placeholders:
           "$ref": "#/components/schemas/PlaceholdersData"
         fields:
@@ -295,6 +251,7 @@ components:
         - componentName
       additionalProperties: false
       description: Definition of a component instance within a placeholder on a route
+    
     ComponentFields:
       type: object
       additionalProperties:
@@ -305,12 +262,14 @@ components:
             items:
               "$ref": "#/components/schemas/Item"
       description: Content field data passed to a component
+    
     ComponentParams:
       type: object
       additionalProperties:
         type: string
       description: Component params
       example: {}
+    
     HtmlElementRendering:
       type: object
       properties:
@@ -333,6 +292,7 @@ components:
         - attributes
       additionalProperties: false
       description: HTML content used to support Sitecore Experience Editor
+    
     PlaceholderData:
       type: object
       properties:
