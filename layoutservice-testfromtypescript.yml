@@ -8,9 +8,9 @@ info:
     Sitecore CMS doesn't provide OpenAPI/Swagger specification files for their Layout Service's REST API.
 
     This handwritten specification file may not reflect the full level of detail that may be included in a real HTTP response from Sitecore CMS's layout service API.
-    
+
     However, it can be used to learn the service's most common request structure expectations.
-    
+
     It also provides minimalist example responses that can be used to drive a mock server.
   contact:
     name: "Example Example"
@@ -62,8 +62,6 @@ paths:
         "500":
           description: A server error response
 
-
-
 components:
   schemas:
     LayoutServiceData:
@@ -99,10 +97,13 @@ components:
       properties:
         pageEditing:
           type: boolean
+          example: false
         language:
           type: string
+          example: "en"
         pageState:
           "$ref": "#/components/schemas/LayoutServicePageState"
+          example: "normal"
         visitorIdentificationTimestamp:
           type: number
         site:
@@ -110,6 +111,7 @@ components:
           properties:
             name:
               type: string
+              example: null
           additionalProperties: false
         editMode:
           "$ref": "#/components/schemas/EditMode"
@@ -145,8 +147,10 @@ components:
       properties:
         name:
           type: string
+          example: "Home"
         displayName:
           type: string
+          example: "Home"
         fields:
           type: object
           additionalProperties:
@@ -156,24 +160,41 @@ components:
               - type: array
                 items:
                   "$ref": "#/components/schemas/Item"
+          example:
+            hello:
+              value: "world"
+            later:
+              value: "alligator"
         databaseName:
           type: string
+          example: "iamadb"
         deviceId:
           type: string
+          format: uuid
+          example: "fe5d7fdf-89c0-4d99-9aa3-b5fbd009c9f3"
         itemLanguage:
           type: string
+          example: "en"
         itemVersion:
-          type: number
+          type: integer
+          example: 1
         layoutId:
           type: string
+          format: uuid
+          example: "22222222-2222-2222-222222222222"
         templateId:
           type: string
+          format: uuid
+          example: "33333333-3333-3333-333333333333"
         templateName:
           type: string
+          example: "Sample Page Item Etc"
         placeholders:
           "$ref": "#/components/schemas/PlaceholdersData"
         itemId:
           type: string
+          format: uuid
+          example: "11111111-1111-1111-1111-111111111111"
       required:
         - name
         - placeholders
@@ -252,6 +273,25 @@ components:
         "Placeholder contents data (name: placeholder name, then array of
         components within that placeholder name) Note: HtmlElementRendering is used
         by Sitecore Experience Editor"
+      example:
+        - uid: "123"
+          componentName: "world"
+          dataSource: "{55555555-5555-5555-555555555555}"
+          params: {}
+          fields:
+            title:
+              value: "Fabulousness"
+            subtitle:
+              value: "Magnificence"
+        - uid: "456"
+          componentName: "alligator"
+          dataSource: "{66666666-6666-6666-666666666666}"
+          params: {}
+          fields:
+            headline:
+              value: "snappy"
+            text:
+              value: "croc"
     ComponentRendering:
       type: object
       properties:
