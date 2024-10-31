@@ -235,6 +235,7 @@ components:
             type: object
             additionalProperties: {}
       description: Field value data on a component
+      example: "field value 0"
     Item:
       type: object
       properties:
@@ -273,32 +274,15 @@ components:
         "Placeholder contents data (name: placeholder name, then array of
         components within that placeholder name) Note: HtmlElementRendering is used
         by Sitecore Experience Editor"
-      example:
-        - uid: "123"
-          componentName: "world"
-          dataSource: "{55555555-5555-5555-555555555555}"
-          params: {}
-          fields:
-            title:
-              value: "Fabulousness"
-            subtitle:
-              value: "Magnificence"
-        - uid: "456"
-          componentName: "alligator"
-          dataSource: "{66666666-6666-6666-666666666666}"
-          params: {}
-          fields:
-            headline:
-              value: "snappy"
-            text:
-              value: "croc"
     ComponentRendering:
       type: object
       properties:
         componentName:
           type: string
+          example: "world"
         dataSource:
           type: string
+          example: "{44444444-4444-4444-444444444444}"
         uid:
           type: string
         placeholders:
@@ -326,6 +310,7 @@ components:
       additionalProperties:
         type: string
       description: Component params
+      example: {}
     HtmlElementRendering:
       type: object
       properties:
